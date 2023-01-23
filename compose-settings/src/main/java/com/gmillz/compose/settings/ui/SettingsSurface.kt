@@ -4,6 +4,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.navigation.NamedNavArgument
+import androidx.navigation.NavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
@@ -39,7 +41,10 @@ fun SettingsSurface(
 
 fun NavGraphBuilder.loadScreens(screens: List<SettingsScreen>) {
     screens.forEach { screen ->
-        composable(screen.route) {
+        composable(
+            route = screen.route,
+            arguments = screen.arguments
+        ) {
             screen.composable(it)
         }
         if (screen.screens.isNotEmpty()) {
@@ -51,4 +56,5 @@ fun NavGraphBuilder.loadScreens(screens: List<SettingsScreen>) {
 data class SettingsScreen(
     val route: String,
     val screens: List<SettingsScreen> = emptyList(),
+    val arguments: List<NamedNavArgument> = emptyList(),
     val composable: @Composable (NavBackStackEntry) -> Unit)

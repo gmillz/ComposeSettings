@@ -48,7 +48,7 @@ android {
 
 dependencies {
 
-    implementation("com.github.gmillz:ComposeSettings:1.0.1")
+    implementation("com.github.gmillz:ComposeSettings:1.0.3")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.5.1")

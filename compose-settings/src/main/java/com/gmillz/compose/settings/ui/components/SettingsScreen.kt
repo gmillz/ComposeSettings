@@ -1,4 +1,4 @@
-package com.gmillz.compose.settings.ui
+package com.gmillz.compose.settings.ui.components
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.background
@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.gmillz.compose.settings.ui.components.NestedScrollStretch
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)

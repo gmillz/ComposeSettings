@@ -1,6 +1,5 @@
 package com.gmillz.compose.settings.ui.components
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,10 +38,9 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
-fun SettingsScreen(
+fun SettingsPage(
     navController: NavController,
     onBack: (() -> Unit)? = { navController.popBackStack() },
     title: @Composable (() -> Unit)? = null,
@@ -68,7 +66,7 @@ fun SettingsScreen(
             SnackbarHost(hostState = snackbarHostState)
         },
         bottomBar = { bottomBar() },
-    ) {innerPadding ->
+    ) { innerPadding ->
         NestedScrollStretch {
             Column(
                 verticalArrangement = Arrangement.spacedBy(8.dp),

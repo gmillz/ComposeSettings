@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="n_percent">%1$d%%</string>
+
+    <!-- Spoken title when a navigation drawer opens. -->
+    <string name="navigation_menu">"Navigation menu"</string>
+    <!--
+      Spoken content description of an element which will close the navigation menu when clicked.
+    -->
+    <string name="close_drawer">"Close navigation menu"</string>
+    <!-- Spoken content description of an element which will close the sheet when clicked. -->
+    <string name="close_sheet">"Close sheet"</string>
+    <!-- Default accessibility error text for an editable text field. -->
+    <string name="default_error_message">"Invalid input"</string>
+    <!-- Spoken title of a dropdown menu. -->
+    <string name="dropdown_menu">"Dropdown menu"</string>
+    <!-- Spoken content description of the start seek control in a range slider. -->
+    <string name="range_start">"Range start"</string>
+    <!-- Spoken content description of the end seek control in a range slider. -->
+    <string name="range_end">"Range end"</string>
+</resources>

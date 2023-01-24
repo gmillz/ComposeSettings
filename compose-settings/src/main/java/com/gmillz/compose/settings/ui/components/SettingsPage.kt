@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumedWindowInsets
@@ -105,7 +106,8 @@ fun BottomSpacer() {
 fun SettingsToolbar(
     title: @Composable () -> Unit,
     onBack: (() -> Unit)? = null,
-    scrollBehavior: TopAppBarScrollBehavior
+    scrollBehavior: TopAppBarScrollBehavior,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
     TopAppBar(
         title = title,
@@ -119,6 +121,7 @@ fun SettingsToolbar(
                 }
             }
         },
+        actions = actions,
         scrollBehavior = scrollBehavior
     )
 }

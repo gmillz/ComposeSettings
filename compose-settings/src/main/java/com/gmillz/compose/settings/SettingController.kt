@@ -8,6 +8,9 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty
 
@@ -32,7 +35,7 @@ private class MutableStateSettingController<T>(
 class SettingControllerImpl<T>(
     private val get: () -> T,
     private val set: (T) -> Unit
-) : SettingController<T>, SettingChangeListener {
+) : SettingController<T>, SettingChangeListener<T> {
     private val stateInternal = mutableStateOf(get())
     override val state: State<T> get() = stateInternal
 
@@ -41,7 +44,7 @@ class SettingControllerImpl<T>(
         stateInternal.value = newValue
     }
 
-    override fun onSettingChange() {
+    override fun onSettingChange(value: T) {
         stateInternal.value = get()
     }
 }
@@ -64,12 +67,22 @@ fun <T> SettingEntry<T>.getState() = getController().state
 @Composable
 fun <T> SettingEntry<T>.observeAsState() = getController().state
 
+fun <T> SettingEntry<T>.asFlow(): Flow<T> {
+    return callbackFlow {
+        val listener = SettingChangeListener<T> {
+            trySend(it)
+        }
+        addListener(listener)
+        awaitClose { removeListener(listener) }
+    }
+}
+
 @Composable
-private fun <P, T> getController(
+private fun <P> getController(
     setting: SettingEntry<P>,
-    get: () -> T,
-    set: (T) -> Unit
-): SettingController<T> {
+    get: () -> P,
+    set: (P) -> Unit
+): SettingController<P> {
     val controller = remember { SettingControllerImpl(get, set) }
     DisposableEffect(setting) {
         setting.addListener(controller)

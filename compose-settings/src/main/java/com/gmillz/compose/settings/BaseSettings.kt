@@ -40,7 +40,7 @@ open class BaseSettings(private val context: Context) : SharedPreferences.OnShar
         private val primaryListener: ChangeListener?
     ) : SettingEntry<T> {
         protected var loaded = false
-        private val listeners = CopyOnWriteArraySet<SettingChangeListener>()
+        private val listeners = CopyOnWriteArraySet<SettingChangeListener<T>>()
 
         fun invalidate() {
             loaded = false
@@ -50,15 +50,16 @@ open class BaseSettings(private val context: Context) : SharedPreferences.OnShar
             loaded = false
             primaryListener?.invoke()
             listeners.forEach { listener ->
-                listener.onSettingChange()
+                listener.onSettingChange(get())
             }
         }
 
-        override fun addListener(listener: SettingChangeListener) {
+        override fun addListener(listener: SettingChangeListener<T>) {
             listeners.add(listener)
+            listener.onSettingChange(get())
         }
 
-        override fun removeListener(listener: SettingChangeListener) {
+        override fun removeListener(listener: SettingChangeListener<T>) {
             listeners.remove(listener)
         }
     }

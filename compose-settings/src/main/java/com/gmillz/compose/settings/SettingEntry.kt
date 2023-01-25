@@ -15,8 +15,8 @@ sealed interface SettingEntry<T> {
     fun get(): T
     fun set(newValue: T)
 
-    fun addListener(listener: SettingChangeListener)
-    fun removeListener(listener: SettingChangeListener)
+    fun addListener(listener: SettingChangeListener<T>)
+    fun removeListener(listener: SettingChangeListener<T>)
 
     fun subscribeChanges(onChange: Runnable): SafeCloseable {
         val observer = SettingLifecycleObserver(this, onChange)

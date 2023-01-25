@@ -6,7 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 class SettingLifecycleObserver<T>(
     private val setting: SettingEntry<T>,
     private val onChange: Runnable
-) : DefaultLifecycleObserver, SettingChangeListener {
+) : DefaultLifecycleObserver, SettingChangeListener<T> {
 
     fun connectListener() {
         setting.addListener(this)
@@ -26,7 +26,7 @@ class SettingLifecycleObserver<T>(
         disconnectListener()
     }
 
-    override fun onSettingChange() {
+    override fun onSettingChange(value: T) {
         onChange.run()
     }
 }

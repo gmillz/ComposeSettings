@@ -1,60 +1,36 @@
 package com.gmillz.compose.settings
 
-import android.view.View
-import androidx.core.util.Consumer
-import androidx.lifecycle.LifecycleOwner
-import com.gmillz.compose.settings.util.SafeCloseable
+import androidx.datastore.preferences.core.Preferences
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 import kotlin.reflect.KProperty
 
-typealias ChangeListener = () -> Unit
-
-sealed interface SettingEntry<T> {
-    val key: String
+sealed interface SettingEntry<T, K> {
+    val key: Preferences.Key<K>
     val defaultValue: T
 
-    fun get(): T
-    fun set(newValue: T)
+    fun get(): Flow<T>
+    fun set(value: T)
 
-    fun addListener(listener: SettingChangeListener<T>)
-    fun removeListener(listener: SettingChangeListener<T>)
+    suspend fun first() = get().first()
 
-    fun subscribeChanges(onChange: Runnable): SafeCloseable {
-        val observer = SettingLifecycleObserver(this, onChange)
-        observer.connectListener()
-        return SafeCloseable { observer.disconnectListener() }
+    fun firstBlocking() = runBlocking { first() }
+
+    fun setBlocking(value: T) {
+        runBlocking { set(value) }
     }
 
-    fun subscribeChanges(lifecycleOwner: LifecycleOwner, onChange: Runnable) {
-        lifecycleOwner.lifecycle.addObserver(SettingLifecycleObserver(this, onChange))
+    fun onEach(
+        launchIn: CoroutineScope,
+        block: (T) -> Unit
+    ) {
+        get().onEach { block(it) }.launchIn(launchIn)
     }
 
-    fun subscribeChanges(view: View, onChange: Runnable) {
-        val observer = SettingLifecycleObserver(this, onChange)
-        view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(v: View) {
-                observer.connectListener()
-            }
-
-            override fun onViewDetachedFromWindow(v: View) {
-                observer.disconnectListener()
-            }
-        })
-    }
-
-    fun subscribeValues(lifecycleOwner: LifecycleOwner, onChange: Consumer<T>) {
-        onChange.accept(get())
-        subscribeChanges(lifecycleOwner) {
-            onChange.accept(get())
-        }
-    }
-
-    fun subscribeValues(view: View, onChange: Consumer<T>) {
-        onChange.accept(get())
-        subscribeChanges(view) {
-            onChange.accept(get())
-        }
-    }
-
-    operator fun getValue(thisObj: Any?, property: KProperty<*>): T = get()
+    operator fun getValue(thisObj: Any?, property: KProperty<*>): Flow<T> = get()
     operator fun setValue(thisObj: Any?, property: KProperty<*>, newValue: T) = set(newValue)
 }

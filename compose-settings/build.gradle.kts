@@ -43,6 +43,7 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.0")
     implementation("com.google.android.material:material:1.7.0")
     implementation("androidx.preference:preference-ktx:1.2.0")
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     implementation("androidx.compose.ui:ui:1.3.3")
     implementation("androidx.compose.material3:material3:1.0.1")
@@ -61,7 +62,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.gmillz"
                 artifactId = "ComposeSettings"
-                version = "1.0.8"
+                version = "1.1.2"
             }
         }
     }

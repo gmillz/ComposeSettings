@@ -1,16 +1,11 @@
 package com.gmillz.compose.settings
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.launch
 import kotlin.reflect.KProperty
 
@@ -20,33 +15,6 @@ interface SettingController<T> {
 
     operator fun getValue(thisObj: Any?, property: KProperty<*>): T = state.value
     operator fun setValue(thisObj: Any?, property: KProperty<*>, newValue: T) = onChange(newValue)
-}
-
-private class MutableStateSettingController<T>(
-    private val mutableState: MutableState<T>
-) : SettingController<T> {
-    override val state = mutableState
-
-    override fun onChange(newValue: T) {
-        mutableState.value = newValue
-    }
-}
-
-class SettingControllerImpl<T>(
-    private val get: () -> T,
-    private val set: (T) -> Unit
-) : SettingController<T>, SettingChangeListener<T> {
-    private val stateInternal = mutableStateOf(get())
-    override val state: State<T> get() = stateInternal
-
-    override fun onChange(newValue: T) {
-        set(newValue)
-        stateInternal.value = newValue
-    }
-
-    override fun onSettingChange(value: T) {
-        stateInternal.value = get()
-    }
 }
 
 private class StateSettingController<T>(
@@ -59,36 +27,13 @@ private class StateSettingController<T>(
 }
 
 @Composable
-fun <T> SettingEntry<T>.getController() = getController(this, ::get, ::set)
-
-@Composable
-fun <T> SettingEntry<T>.getState() = getController().state
-
-@Composable
-fun <T> SettingEntry<T>.observeAsState() = getController().state
-
-fun <T> SettingEntry<T>.asFlow(): Flow<T> {
-    return callbackFlow {
-        val listener = SettingChangeListener<T> {
-            trySend(it)
-        }
-        addListener(listener)
-        awaitClose { removeListener(listener) }
-    }
+fun <T, K> SettingEntry<T, K>.asState(): State<T> {
+    return this.get().collectAsState(initial = defaultValue)
 }
 
 @Composable
-private fun <P> getController(
-    setting: SettingEntry<P>,
-    get: () -> P,
-    set: (P) -> Unit
-): SettingController<P> {
-    val controller = remember { SettingControllerImpl(get, set) }
-    DisposableEffect(setting) {
-        setting.addListener(controller)
-        onDispose { setting.removeListener(controller) }
-    }
-    return controller
+fun <T, K> SettingEntry<T, K>.getController(): SettingController<T> {
+    return createStateController(state = asState(), set = this::set)
 }
 
 @Composable
@@ -113,11 +58,6 @@ fun <T, R> rememberTransformController(
     TransformSettingController(controller, transformGet, transformSet)
 }
 
-@Composable
-fun <T> MutableState<T>.asSettingController(): SettingController<T> {
-    return remember(this) { MutableStateSettingController(this) }
-}
-
 private class TransformSettingController<T, R>(
     private val parent: SettingController<T>,
     private val transformGet: (T) -> R,
@@ -126,20 +66,6 @@ private class TransformSettingController<T, R>(
     override val state = derivedStateOf { transformGet(parent.state.value) }
     override fun onChange(newValue: R) {
         parent.onChange(transformSet(newValue))
-    }
-}
-
-@Composable
-fun <T> customSettingController(value: T, onValueChange: (T) -> Unit): SettingController<T> {
-    val state = remember {
-        mutableStateOf(value)
-    }
-    state.value = value
-    return object : SettingController<T> {
-        override val state = state
-        override fun onChange(newValue: T) {
-            onValueChange(newValue)
-        }
     }
 }
 

@@ -38,11 +38,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.gmillz.compose.settings.util.LocalNavController
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun SettingsPage(
-    navController: NavController,
+    navController: NavController = LocalNavController.current,
     onBack: (() -> Unit)? = { navController.popBackStack() },
     title: @Composable (() -> Unit)? = null,
     floatingActionButton: @Composable (() -> Unit) = {},

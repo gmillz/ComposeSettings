@@ -9,7 +9,7 @@ android {
     compileSdk = 33
 
     defaultConfig {
-        minSdk = 24
+        minSdk = 21
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -62,7 +62,7 @@ afterEvaluate {
                 from(components["release"])
                 groupId = "com.github.gmillz"
                 artifactId = "ComposeSettings"
-                version = "1.1.2"
+                version = "1.1.3"
             }
         }
     }

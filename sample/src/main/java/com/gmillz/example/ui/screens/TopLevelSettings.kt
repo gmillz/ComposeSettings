@@ -8,6 +8,7 @@ import com.gmillz.compose.settings.ui.components.ListSetting
 import com.gmillz.compose.settings.ui.components.SettingSwitch
 import com.gmillz.compose.settings.ui.components.SettingTemplate
 import com.gmillz.compose.settings.ui.components.SettingsPage
+import com.gmillz.compose.settings.ui.components.SliderSetting
 import com.gmillz.compose.settings.util.LocalNavController
 import com.gmillz.example.CustomClass
 import com.gmillz.example.Settings
@@ -37,6 +38,19 @@ fun TopLevelSettings(
                 ListEntry(CustomClass("name2", "label2"), true, { "name2" })
             ),
             label = "Sample CustomClass ListSetting"
+        )
+        SliderSetting(
+            label = "Slider Setting 1",
+            controller = settings.sliderTest1.getController(),
+            valueRange = 2..10,
+            step = 1
+        )
+
+        SliderSetting(
+            label = "Slider Setting 2",
+            controller = settings.sliderTest2.getController(),
+            valueRange = 5..50,
+            step = 5
         )
     }
 }

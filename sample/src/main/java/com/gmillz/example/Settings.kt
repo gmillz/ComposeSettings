@@ -24,4 +24,14 @@ class Settings(context: Context): BaseSettings(context) {
         parse = { CustomClass.fromString(it) },
         save = { it.toString() }
     )
+
+    val sliderTest1 = setting(
+        key = intPreferencesKey("slider_test_1"),
+        defaultValue = 4
+    )
+
+    val sliderTest2 = setting(
+        key = intPreferencesKey("slider_test_2"),
+        defaultValue = 55
+    )
 }

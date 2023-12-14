@@ -11,8 +11,9 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -28,14 +29,14 @@ import kotlin.math.roundToInt
 @Composable
 fun SliderSetting(
     label: String,
-    value: SettingController<Int>,
+    controller: SettingController<Int>,
     valueRange: ClosedRange<Int>,
     step: Int,
     showAsPercentage: Boolean = false,
     onChange: (Int) -> Unit = {},
 ) {
     val transformState = rememberTransformController(
-        controller = value,
+        controller = controller,
         transformGet = { it.toFloat() },
         transformSet = { it.roundToInt() }
     )
@@ -43,7 +44,7 @@ fun SliderSetting(
     val endInclusive = valueRange.endInclusive.toFloat()
     SliderSetting(
         label = label,
-        value = transformState,
+        controller = transformState,
         valueRange = start..endInclusive,
         step = step.toFloat(),
         showAsPercentage = showAsPercentage,
@@ -54,13 +55,19 @@ fun SliderSetting(
 @Composable
 fun SliderSetting(
     label: String,
-    value: SettingController<Float>,
+    controller: SettingController<Float>,
     valueRange: ClosedFloatingPointRange<Float>,
     step: Float,
     showAsPercentage: Boolean = false,
     onChange: (Float) -> Unit = {}
 ) {
-    var sliderValue by remember { mutableStateOf(value.state.value) }
+    var controllerValue by controller
+    var sliderValue by remember { mutableFloatStateOf(controllerValue) }
+
+    DisposableEffect(controllerValue) {
+        sliderValue = controllerValue
+        onDispose {  }
+    }
 
     SettingTemplate(
         title = {
@@ -79,15 +86,15 @@ fun SliderSetting(
                 CompositionLocalProvider(
                     LocalContentColor provides MaterialTheme.colorScheme.onBackground
                 ) {
-                    val lv = snapSliderValue(valueRange.start, sliderValue, step)
+                    val value = snapSliderValue(valueRange.start, sliderValue, step)
                     Text(
                         text = if (showAsPercentage) {
                             stringResource(
                                 id = R.string.n_percent,
-                                (lv * 100).roundToInt()
+                                (value * 100).roundToInt()
                             )
                         } else {
-                            lv.roundToInt().toString()
+                            value.roundToInt().toString()
                         },
                         fontWeight = FontWeight.Normal
                     )
@@ -101,7 +108,7 @@ fun SliderSetting(
                     sliderValue = newValue
                 },
                 onValueChangeFinished = {
-                    value.onChange(sliderValue)
+                    controllerValue = sliderValue
                     onChange(sliderValue)
                 },
                 valueRange = valueRange,
